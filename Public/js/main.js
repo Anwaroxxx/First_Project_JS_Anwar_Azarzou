@@ -225,7 +225,19 @@ while (true) {
           }
         }
       } else if (menuChoice === "3") {
-        console.log("Deposit Money feature coming soon.");
+        let userMoney = loggedInUser.money || 0;
+        let deposit = parseInt(prompt(`Enter your deposit value : ==>`));
+        if(isNaN(deposit) || deposit <= 0){
+            console.log(`Enter a valid number`);
+        }
+        else if(deposit > 1000){
+            console.log(`you can't deposit more than $1000`);
+        }
+        else{
+            userMoney += deposit;
+            loggedInUser.money = userMoney;
+            console.log(`You're new balance is $${userMoney}`);
+        }
       } else if (menuChoice === "4") {
         console.log("Loan feature coming soon.");
       } else if (menuChoice === "5") {
