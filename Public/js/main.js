@@ -104,11 +104,6 @@ while (true) {
 
   let choice = prompt("==> ");
 
-  if (choice === "4" || choice.toLowerCase() === "exit") {
-    console.log("exiting...");
-    break;
-  }
-
   if (choice === "1") {
     //!--- Name ---
     let userName = "";
@@ -118,6 +113,9 @@ while (true) {
         console.log(
           "Invalid name. Must be letters, min 5 chars, first letters uppercase."
         );
+      } else if (users.some((u) => u.name === userName)) {
+        console.log("Name already exists. Try another.");
+        userName = "";
       }
     }
 
@@ -221,7 +219,7 @@ while (true) {
           } else {
             userMoney -= withdraw;
             loggedInUser.money = userMoney;
-            console.log(`You have $${userMoney} left`);
+            console.log(`\nYou have $${userMoney} left`);
           }
         }
       } else if (menuChoice === "3") {
@@ -236,7 +234,7 @@ while (true) {
         else{
             userMoney += deposit;
             loggedInUser.money = userMoney;
-            console.log(`You're new balance is $${userMoney}`);
+            console.log(`\nYou're new balance is $${userMoney}`);
         }
       } else if (menuChoice === "4") {
         console.log("Loan feature coming soon.");
@@ -265,5 +263,9 @@ while (true) {
     else{
       console.log(`Your email doesn't exist.`);
     }
+  }
+    else if (choice === "4" || choice.toLowerCase() === "exit") {
+    console.log("exiting...");
+    break;
   }
 }
