@@ -247,4 +247,23 @@ while (true) {
       }
     }
   }
+  else if(choice === '3'){
+    let emailVerify = prompt(`Enter your email : `);
+    let user = users.find((u) => u.email === emailVerify);
+    
+    if(user){
+      let ModifyPass = "";
+      while (!ModifyPass || !validatePassword(ModifyPass)) {
+        ModifyPass = prompt(`Enter new password : `);
+        if (!validatePassword(ModifyPass)) {
+          console.log("Invalid password. Min 7 chars and include one special (@#-+*/).");
+        }
+      }
+      user.password = ModifyPass;
+      console.log("Password changed successfully.");
+    }
+    else{
+      console.log(`Your email doesn't exist.`);
+    }
+  }
 }
