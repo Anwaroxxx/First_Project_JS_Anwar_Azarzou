@@ -1,4 +1,6 @@
-const prompt = require("prompt-sync")(); //!For prompting in Terminal.
+const prompt = require("prompt-sync")(); //! For Terminal input
+
+/**********************************************************************************/
 
 //!validation of name
 function validateName(name) {
@@ -11,7 +13,8 @@ function validateName(name) {
 
   for (let i = 0; i < name.length; i++) {
     let char = name[i];
-    if (char !== " " &&
+    if (
+      char !== " " &&
       (char < "A" || (char > "Z" && char < "a") || char > "z")
     ) {
       return false;
@@ -28,88 +31,109 @@ function validateName(name) {
 //!email validation
 
 function validateEmail(email) {
-    email = email.trim().toLowerCase();
+  email = email.trim().toLowerCase();
 
-    if (email.includes(" ")) {
-        return false;
+  if (email.includes(" ")) {
+    return false;
+  }
+
+  let atCount = 0;
+  for (let i = 0; i < email.length; i++) {
+    if (email[i] === "@") {
+      atCount++;
     }
+  }
 
-    let atCount = 0;
-    for (let i = 0; i < email.length; i++) {
-        if (email[i] === "@") {
-            atCount++;
-        }
-    }
+  if (atCount !== 1) {
+    return false;
+  }
 
-    if (atCount !== 1) {
-        return false;
-    }
-
-    return true;
+  return true;
 }
 
+//! age validation
+function validateAge(age) {
+  age = age.trim();
 
+  if (age.length === 0 || age.length > 2) {
+    return false;
+  }
+
+  for (let i = 0; i < age.length; i++) {
+    if (!(age[i] >= "0" && age[i] <= "9")) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+//!password validation
+function validatePassword(password) {
+  password = password.trim();
+
+  if (password.length < 7) {
+    return false;
+  }
+
+  if (password.includes(" ")) {
+    return false;
+  }
+
+  let specialChars = "@#-+*/";
+  let hasSpecial = false;
+
+  for (let i = 0; i < password.length; i++) {
+    if (specialChars.includes(password[i])) {
+      hasSpecial = true;
+      break;
+    }
+  }
+
+  return hasSpecial;
+}
 
 let users = [];
 
 while (true) {
-  let greetings = prompt(`Hello To Our Bank! \n
-        Choose an Option: \n
-        1) Sign up\n
-        2) Log in\n
-        3) Change Password\n
-        4) Exit\n`);
+  console.log("\nHello To Our Bank!");
+  console.log("1) Sign up");
+  console.log("2) Log in");
+  console.log("3) Change Password");
+  console.log("4) Exit");
 
-  if (greetings === "exit") {
-    console.log("Exiting...");
+  let choice = prompt("==> ");
+
+  if (choice === "4" || choice.toLowerCase() === "exit") {
+    console.log("exiting...");
     break;
   }
 
-  if (greetings === "1") {
+  if (choice === "1") {
+    //!--- Name ---
     let userName = "";
     while (!userName || !validateName(userName)) {
-      userName = prompt("Enter your full name: ");
-      if (!userName || !validateName(userName)) {
-        console.log("Invalid name. Please try again.");
+      userName = prompt("Enter your name: ");
+      if (!validateName(userName)) {
+        console.log("Invalid name. Must be letters, min 5 chars, first letters uppercase.");
       }
     }
 
+    //!--- Email ---
     let userEmail = "";
     while (
       !userEmail ||
       !validateEmail(userEmail) ||
-      users.some((user) => user.email === userEmail)
+      users.some(u => u.email === userEmail)
     ) {
       userEmail = prompt("Enter your email: ");
-      if (!userEmail || !validateEmail(userEmail)) {
-        console.log("Invalid email. Please try again.");
-      } else if (users.some((user) => user.email === userEmail)) {
-        console.log("Email already exists. Please try again.");
+      if (!validateEmail(userEmail)) {
+        console.log(" Invalid email. Try again.");
+      } else if (users.some(u => u.email === userEmail)) {
+        console.log("Email already exists. Try another.");
+        userEmail = ""; // reset to force repeat
       }
     }
 
-    let userAge = "";
-    while (!userAge || !validateAge(userAge)) {
-      userAge = prompt("Enter your age: ");
-      if (!userAge || !validateAge(userAge)) {
-        console.log("Invalid age. Please try again.");
-      }
-    }
-
-    let userPassword = "";
-    while (!userPassword || !validatePassword(userPassword)) {
-      userPassword = prompt("Enter your password: ");
-      if (!userPassword || !validatePassword(userPassword)) {
-        console.log("Invalid password. Please try again.");
-      }
-    }
-
-    users.push({
-      name: userName,
-      email: userEmail,
-      age: userAge,
-      password: userPassword,
-    });
-    console.log("User registered successfully:", userName);
+    
   }
-}
