@@ -1,5 +1,4 @@
 const prompt = require("prompt-sync")(); //! For Terminal input
-
 /**********************************************************************************/
 
 //!validation of name
@@ -93,179 +92,192 @@ function validatePassword(password) {
   return hasSpecial;
 }
 
+//TODO : user Class
+class User {
+  constructor(name, email, age, password) {
+    this.name = name;
+    this.email = email;
+    this.age = age;
+    this.password = password;
+    this.money = 1000;
+    this.history = [];
+  }
+
+  addHistory(action) {
+    let date = new Date().toLocaleString();
+    this.history.push(`[${date}] ${action}`);
+  }
+
+  withdraw() {
+    if (this.money <= 0) {
+      console.log("You have $0 left.");
+      return;
+    }
+
+    let amount = parseInt(prompt("Withdraw amount: "));
+    if (isNaN(amount) || amount <= 0) {
+      console.log("Invalid amount.");
+    } else if (amount > this.money) {
+      console.log("Insufficient funds.");
+    } else {
+      this.money -= amount;
+
+      this.addHistory(`Withdraw: $${amount} | Balance: $${this.money}`);
+      console.log(`You now have $${this.money}`);
+    }
+  }
+
+  deposit() {
+    let amount = parseInt(prompt("Deposit amount: "));
+    if (isNaN(amount) || amount <= 0) {
+      console.log("Invalid amount.");
+    } else if (amount > 1000) {
+      console.log("You can't deposit more than $1000.");
+    } else {
+      this.money += amount;
+
+      this.addHistory(`Deposit: $${amount} | Balance: $${this.money}`);
+
+      console.log(`Your new balance is $${this.money}`);
+    }
+  }
+
+  invest() {
+    console.log("Investment feature coming soon.");
+  }
+
+  showHistory() {
+    if (this.history.length === 0) {
+      console.log("No transactions yet.");
+    } else {
+      console.log("\n===== TRANSACTION HISTORY =====");
+      for (let h of this.history) {
+        console.log(h);
+      }
+    }
+  }
+
+  static login(users) {
+    let loggedUser = null;
+
+    while (!loggedUser) {
+      let email = prompt("Email: ");
+      let password = prompt("Password: ");
+
+      let user = users.find((u) => u.email === email);
+
+      if (!user) {
+        console.log("Email not found.");
+      } else if (user.password !== password) {
+        console.log("Wrong password.");
+      } else {
+        console.log(`WELCOME ${user.name}`);
+        loggedUser = user;
+      }
+    }
+    return loggedUser;
+  }
+}
+
+//TODO: Menu options
+
 let users = [];
 
 while (true) {
-  console.log("\nHello To Our Bank!");
-  console.log("1) Sign up");
-  console.log("2) Log in");
+  console.log("\n===== BANK SYSTEM =====");
+  console.log("1) Sign Up");
+  console.log("2) Log In");
   console.log("3) Change Password");
   console.log("4) Exit");
 
   let choice = prompt("==> ");
 
+  //!SIGN- UP SECTION
   if (choice === "1") {
-    //!--- Name ---
-    let userName = "";
-    while (!userName || !validateName(userName)) {
-      userName = prompt("Enter your name: ");
-      if (!validateName(userName)) {
-        console.log(
-          "Invalid name. Must be letters, min 5 chars, first letters uppercase."
-        );
-      } else if (users.some((u) => u.name === userName)) {
-        console.log("Name already exists. Try another.");
-        userName = "";
-      }
+    let name = "";
+    while (!name || !validateName(name) || users.some((u) => u.name === name)) {
+      name = prompt("Name: ");
     }
 
-    //!--- Email ---
-    let userEmail = "";
-    while (
-      !userEmail ||
-      !validateEmail(userEmail) ||
-      users.some((u) => u.email === userEmail)
-    ) {
-      userEmail = prompt("Enter your email: ");
-      if (!validateEmail(userEmail)) {
-        console.log(" Invalid email. Try again.");
-      } else if (users.some((u) => u.email === userEmail)) {
-        console.log("Email already exists. Try another.");
-        userEmail = "";
-      }
+    let email = "";
+    while (!email || !validateEmail(email) || users.some((u) => u.email === email)) {
+      email = prompt("Email: ");
     }
 
-    //!--- Age ---
-    let userAge = "";
-    while (!userAge || !validateAge(userAge)) {
-      userAge = prompt("Enter your age: ");
-      if (!validateAge(userAge)) console.log(" Invalid age. Try again.");
+    let age = "";
+    while (!age || !validateAge(age)) {
+      age = prompt("Age: ");
     }
 
-    //!--- Password ---
-    let userPassword = "";
-    while (!userPassword || !validatePassword(userPassword)) {
-      userPassword = prompt("Enter your password: ");
-      if (!validatePassword(userPassword)) {
-        console.log(
-          " Invalid password. Min 7 chars and include one special (@#-+*/)."
-        );
-      }
+    let password = "";
+    while (!password || !validatePassword(password)) {
+      password = prompt("Password: ");
     }
 
-    //!--- Password Verification ---
-    let passVerification = "";
-    while (passVerification !== userPassword) {
-      passVerification = prompt("Re-enter your password to verify: ");
-      if (passVerification !== userPassword) {
-        console.log("Passwords do not match. Try again.");
-      }
+    let confirm = "";
+    while (confirm !== password) {
+      confirm = prompt("Confirm password: ");
     }
 
-    //!Add user
-    users.push({
-      name: userName,
-      email: userEmail,
-      age: userAge,
-      password: userPassword,
-      money: 1000, 
-    });
+    users.push(new User(name, email, age, password));
+    console.log(`User ${name} created successfully!`);
+  }
 
-    console.log(`=====USER SIGNED UP!!!=====\n=====WELCOME : ${userName}=====`);
-  } else if (choice === "2") {
-    let loggedInUser = null;
-    while (!loggedInUser) {
-      let userEmail = prompt("Enter your email: ");
-      let userPassword = prompt("Enter your password: ");
-
-      let user = users.find((u) => u.email === userEmail);
-
-      if (!user) {
-        console.log("Email doesn't exist.");
-      } else if (userPassword !== user.password) {
-        console.log("Password is wrong.");
-      } else {
-        loggedInUser = user;
-        console.log(
-          `=====USER LOGGED IN!!!=====\n=====WELCOME : ${loggedInUser.name}=====`
-        )
-      }
-    }
+  //!LOGIN SECTION
+  else if (choice === "2") {
+    let loggedInUser = User.login(users);
 
     let inMenu = true;
     while (inMenu) {
-      console.log("1) Log Out");
-      console.log("2) Withdraw Money");
-      console.log("3) Deposit Money");
-      console.log("4) Take a Loan");
+      console.log("\n1) Logout");
+      console.log("2) Withdraw");
+      console.log("3) Deposit");
+      console.log("4) Loan");
       console.log("5) Invest");
-      console.log("6) History & Exit");
+      console.log("6) History");
+      console.log("7) Exit");
 
-      let menuChoice = prompt("==> ");
+      let m = prompt("==> ");
 
-      if (menuChoice === "1" || menuChoice === "6") {
+      if (m === "1" || m === "7") {
         console.log("Logging out...");
         inMenu = false;
-      } else if (menuChoice === "2") {
-        let userMoney = loggedInUser.money || 0;
-        if (userMoney <= 0) {
-          console.log(`You have $0 left`);
-        } else {
-          let withdraw = parseInt(prompt(`Enter your withdraw value: ==> `));
-          if (isNaN(withdraw) || withdraw <= 0) {
-            console.log("Invalid amount.");
-          } else if (withdraw > userMoney) {
-            console.log("Insufficient funds.");
-          } else {
-            userMoney -= withdraw;
-            loggedInUser.money = userMoney;
-            console.log(`\nYou have $${userMoney} left`);
-          }
-        }
-      } else if (menuChoice === "3") {
-        let userMoney = loggedInUser.money || 0;
-        let deposit = parseInt(prompt(`Enter your deposit value : ==>`));
-        if(isNaN(deposit) || deposit <= 0){
-            console.log(`Enter a valid number`);
-        }
-        else if(deposit > 1000){
-            console.log(`you can't deposit more than $1000`);
-        }
-        else{
-            userMoney += deposit;
-            loggedInUser.money = userMoney;
-            console.log(`\nYou're new balance is $${userMoney}`);
-        }
-      } else if (menuChoice === "4") {
-        console.log("Loan feature coming soon.");
-      } else if (menuChoice === "5") {
-        console.log("Investment feature coming soon.");
+      } else if (m === "2") {
+        loggedInUser.withdraw();
+      } else if (m === "3") {
+        loggedInUser.deposit();
+      } else if (m === "4") {
+        console.log("====Not done yet :( ====");
+      } else if (m === "5") {
+        console.log("====Not done yet :( ====");
+      } else if (m === "6") {
+        loggedInUser.showHistory();
       } else {
-        console.log("Invalid choice. Please select 1-6.");
+        console.log("Invalid option.");
       }
     }
   }
-  else if(choice === '3'){
-    let emailVerify = prompt(`Enter your email : `);
-    let user = users.find((u) => u.email === emailVerify);
-    
-    if(user){
-      let ModifyPass = "";
-      while (!ModifyPass || !validatePassword(ModifyPass)) {
-        ModifyPass = prompt(`Enter new password : `);
-        if (!validatePassword(ModifyPass)) {
-          console.log("Invalid password. Min 7 chars and include one special (@#-+*/).");
-        }
+
+  //!CHANGING PASSWORD SECTION
+  else if (choice === "3") {
+    let email = prompt("Enter your email: ");
+    let user = users.find((u) => u.email === email);
+
+    if (!user) {
+      console.log("Email not found.");
+    } else {
+      let newPass = "";
+      while (!newPass || !validatePassword(newPass)) {
+        newPass = prompt("New password: ");
       }
-      user.password = ModifyPass;
-      console.log("Password changed successfully.");
-    }
-    else{
-      console.log(`Your email doesn't exist.`);
+      user.password = newPass;
+      console.log("Password updated successfully.");
     }
   }
-    else if (choice === "4" || choice.toLowerCase() === "exit") {
-    console.log("exiting...");
+
+  //!EXITING
+  else if (choice === "4" || choice.toLowerCase() === "exit") {
+    console.log("Exiting..");
     break;
   }
 }
