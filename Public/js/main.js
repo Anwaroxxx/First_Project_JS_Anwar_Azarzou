@@ -28,8 +28,8 @@ function validateName(name) {
   }
   return true;
 }
-//!email validation
 
+//!email validation
 function validateEmail(email) {
   email = email.trim().toLowerCase();
 
@@ -115,7 +115,9 @@ while (true) {
     while (!userName || !validateName(userName)) {
       userName = prompt("Enter your name: ");
       if (!validateName(userName)) {
-        console.log("Invalid name. Must be letters, min 5 chars, first letters uppercase.");
+        console.log(
+          "Invalid name. Must be letters, min 5 chars, first letters uppercase."
+        );
       }
     }
 
@@ -124,16 +126,113 @@ while (true) {
     while (
       !userEmail ||
       !validateEmail(userEmail) ||
-      users.some(u => u.email === userEmail)
+      users.some((u) => u.email === userEmail)
     ) {
       userEmail = prompt("Enter your email: ");
       if (!validateEmail(userEmail)) {
         console.log(" Invalid email. Try again.");
-      } else if (users.some(u => u.email === userEmail)) {
+      } else if (users.some((u) => u.email === userEmail)) {
         console.log("Email already exists. Try another.");
-        userEmail = ""; // reset to force repeat
+        userEmail = "";
       }
     }
 
-    
+    //!--- Age ---
+    let userAge = "";
+    while (!userAge || !validateAge(userAge)) {
+      userAge = prompt("Enter your age: ");
+      if (!validateAge(userAge)) console.log(" Invalid age. Try again.");
+    }
+
+    //!--- Password ---
+    let userPassword = "";
+    while (!userPassword || !validatePassword(userPassword)) {
+      userPassword = prompt("Enter your password: ");
+      if (!validatePassword(userPassword)) {
+        console.log(
+          " Invalid password. Min 7 chars and include one special (@#-+*/)."
+        );
+      }
+    }
+
+    //!--- Password Verification ---
+    let passVerification = "";
+    while (passVerification !== userPassword) {
+      passVerification = prompt("Re-enter your password to verify: ");
+      if (passVerification !== userPassword) {
+        console.log("Passwords do not match. Try again.");
+      }
+    }
+
+    //!Add user
+    users.push({
+      name: userName,
+      email: userEmail,
+      age: userAge,
+      password: userPassword,
+      money: 1000, 
+    });
+
+    console.log(`=====USER SIGNED UP!!!=====\n=====WELCOME : ${userName}=====`);
+  } else if (choice === "2") {
+    let loggedInUser = null;
+    while (!loggedInUser) {
+      let userEmail = prompt("Enter your email: ");
+      let userPassword = prompt("Enter your password: ");
+
+      let user = users.find((u) => u.email === userEmail);
+
+      if (!user) {
+        console.log("Email doesn't exist.");
+      } else if (userPassword !== user.password) {
+        console.log("Password is wrong.");
+      } else {
+        loggedInUser = user;
+        console.log(
+          `=====USER LOGGED IN!!!=====\n=====WELCOME : ${loggedInUser.name}=====`
+        )
+      }
+    }
+
+    let inMenu = true;
+    while (inMenu) {
+      console.log("1) Log Out");
+      console.log("2) Withdraw Money");
+      console.log("3) Deposit Money");
+      console.log("4) Take a Loan");
+      console.log("5) Invest");
+      console.log("6) History & Exit");
+
+      let menuChoice = prompt("==> ");
+
+      if (menuChoice === "1" || menuChoice === "6") {
+        console.log("Logging out...");
+        inMenu = false;
+      } else if (menuChoice === "2") {
+        let userMoney = loggedInUser.money || 0;
+        if (userMoney <= 0) {
+          console.log(`You have $0 left`);
+        } else {
+          let withdraw = parseInt(prompt(`Enter your withdraw value: ==> `));
+          if (isNaN(withdraw) || withdraw <= 0) {
+            console.log("Invalid amount.");
+          } else if (withdraw > userMoney) {
+            console.log("Insufficient funds.");
+          } else {
+            userMoney -= withdraw;
+            loggedInUser.money = userMoney;
+            console.log(`You have $${userMoney} left`);
+          }
+        }
+      } else if (menuChoice === "3") {
+        console.log("Deposit Money feature coming soon.");
+      } else if (menuChoice === "4") {
+        console.log("Loan feature coming soon.");
+      } else if (menuChoice === "5") {
+        console.log("Investment feature coming soon.");
+      } else {
+        console.log("Invalid choice. Please select 1-6.");
+      }
+    }
   }
+}
